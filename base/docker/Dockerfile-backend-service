@@ -1,0 +1,29 @@
+FROM node:8-alpine
+LABEL maintainer "Gabriel Reitz Giannattasio <g@gartz.me>"
+
+# Only change the env if you really know what you're doing
+ENV NODE_ENV=development \
+    START_ENV=production
+
+# Development port
+EXPOSE 3000
+# Inspector (debugger) port
+EXPOSE 9229
+
+WORKDIR /backend
+
+RUN mkdir build
+
+ARG CACHEBUST_PACKAGE=1
+COPY package.json package-lock.json /backend/
+RUN npm install
+
+ARG CACHEBUST_SRC=1
+COPY src /backend/src
+
+COPY docker/entrypoint.sh /entrypoint.sh
+COPY *version package.json /backend/
+
+VOLUME /backend/
+
+CMD /entrypoint.sh

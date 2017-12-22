@@ -1,0 +1,28 @@
+{
+  "name": "dcn",
+  "version": "1.0.0",
+  "description": "docker-compose-nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gartz/dcn.git"
+  },
+  "keywords": [
+    "docker",
+    "compose",
+    "nodejs"
+  ],
+  "author": "Gabriel Reitz Giannattasio <g@gartz.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gartz/dcn/issues"
+  },
+  "homepage": "https://github.com/gartz/dcn#readme",
+  "dependencies": {
+    "command-line-args": "^4.0.7",
+    "execa": "^0.8.0"
+  }
+}

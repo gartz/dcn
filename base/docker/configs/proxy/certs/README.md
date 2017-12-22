@@ -1,0 +1,1 @@
+Add certificate to this folder if you want to run your custom domain in HTTPS.

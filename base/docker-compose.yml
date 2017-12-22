@@ -1,0 +1,71 @@
+version: '3.3'
+
+services:
+  proxy:
+    image: jwilder/nginx-proxy:alpine
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -S 'http://localhost' 2>&1 | grep 'HTTP/'"]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./docker/configs/proxy/vhost.d:/etc/nginx/vhost.d
+      - ./docker/configs/proxy/certs:/etc/nginx/certs
+
+  backend:
+    build:
+      #TODO
+    volumes:
+      - "./backend/src:/backend/src"
+      - "./backend/package.json:/backend/package.json"
+      - "./backend/package-lock.json:/backend/package-lock.json"
+      - "backend_node_modules:/backend/node_modules"
+      - "./docker/entrypoint.sh:/entrypoint.sh"
+    tmpfs:
+      - /code/log
+    links:
+      - memcached
+    expose:
+      - "3000"
+      - "9229"
+    ports:
+      - "9229:9229"
+    environment:
+      # INSPECT: disable|enable|break (break it will stop in the first line until a inspector is attached)
+      INSPECT: enable
+      NODE_ENV: development
+      START_ENV: development
+      PROXY_FRONTEND: http://frontend
+      PROXY_HMR: ws://frontend
+      VIRTUAL_HOST: backend.localhost
+      VIRTUAL_PORT: 3000
+      VIRTUAL_PROTO: http
+
+  frontend:
+    build:
+      #TODO
+    volumes:
+      - "./frontend/src:/code/src"
+      - "./frontend/package.json:/code/package.json"
+      - "./frontend/package-lock.json:/code/package-lock.json"
+      - "frontend_node_modules:/code/node_modules"
+      - "./docker/entrypoint.sh:/entrypoint.sh"
+    expose:
+      - "8080"
+    links:
+      - backend
+    environment:
+      INSPECT: enable
+      NODE_ENV: development
+      START_ENV: development
+      PUBLIC_HOST: frontend.localhost
+      VIRTUAL_HOST: frontend.local.sambatv.club
+      VIRTUAL_PORT: 3000
+      VIRTUAL_PROTO: http
+      PROXY_API_HOST: https://backend:3000
+
+volumes:
+  backend_node_modules:
+  frontend_node_modules:

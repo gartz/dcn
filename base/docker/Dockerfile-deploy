@@ -1,0 +1,27 @@
+FROM node:8-alpine
+LABEL maintainer "Gabriel Reitz Giannattasio <g@gartz.me>"
+
+# Only change the env if you really know what you're doing
+ENV NODE_ENV=production \
+    NO_WATCH=true \
+    API_HOST=""
+
+WORKDIR /code
+
+RUN mkdir build
+
+ARG CACHEBUST_PACKAGE=1
+COPY package.json package-lock.json /code/
+RUN npm install --only=prod && npm install --only=dev
+
+ARG CACHEBUST_SRC=1
+COPY src/ /code/src/
+
+# Force to copy the version file if exists
+COPY *version package.json /code/
+
+RUN node_modules/.bin/webpack --config=src/webpack.config.js --progress --color --profile --hot=false --cache=false
+
+VOLUME /code/build
+
+CMD sh
